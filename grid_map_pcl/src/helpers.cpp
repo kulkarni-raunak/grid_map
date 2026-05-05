@@ -105,7 +105,9 @@ std::string getMapRosbagTopic(rclcpp::Node::SharedPtr & node)
 
 std::string getMapLayerName(rclcpp::Node::SharedPtr & node)
 {
-  node->declare_parameter("map_layer_name", std::string("elevation"));
+  if (!node->has_parameter("map_layer_name")) {
+    node->declare_parameter("map_layer_name", std::string("elevation"));
+  }
 
   std::string mapLayerName;
   node->get_parameter("map_layer_name", mapLayerName);

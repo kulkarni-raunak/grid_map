@@ -1,0 +1,22 @@
+grid_map_visualization:
+  ros__parameters:
+    grid_map_topic: /elevation_map_filtered
+    grid_map_visualizations: [elevation_points, elevation_grid, surface_normals]
+    elevation_points:
+      type: point_cloud
+      params:
+        layer: elevation
+    elevation_grid:
+      type: occupancy_grid
+      params:
+        layer: elevation
+        data_min: -2.0
+        data_max: 2.0
+    surface_normals:
+      type: vectors
+      params:
+        layer_prefix: normal_vectors_
+        position_layer: elevation_inpainted
+        scale: 0.06
+        line_width: 0.003
+        color: 15600153

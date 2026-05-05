@@ -1,0 +1,69 @@
+grid_map_filters:
+  ros__parameters:
+    input_topic: /elevation_map
+    output_topic: /elevation_map_filtered
+
+    filters:
+      filter1:
+        name: inpaint
+        type: gridMapCv/InpaintFilter
+        params:
+          input_layer: elevation
+          output_layer: elevation_inpainted
+          radius: 0.08
+
+      filter2:
+        name: smooth
+        type: gridMapFilters/MeanInRadiusFilter
+        params:
+          input_layer: elevation_inpainted
+          output_layer: elevation_smooth
+          radius: 0.12
+
+      filter3:
+        name: surface_normals
+        type: gridMapFilters/NormalVectorsFilter
+        params:
+          input_layer: elevation_inpainted
+          output_layers_prefix: normal_vectors_
+          radius: 0.12
+          algorithm: area
+          normal_vector_positive_axis: z
+          parallelization_enabled: false
+
+      filter4:
+        name: roughness
+        type: gridMapFilters/MathExpressionFilter
+        params:
+          output_layer: roughness
+          expression: abs(elevation_inpainted - elevation_smooth)
+
+      filter5:
+        name: slope
+        type: gridMapFilters/MathExpressionFilter
+        params:
+          output_layer: slope
+          expression: acos(normal_vectors_z)
+
+      filter6:
+        name: traversability
+        type: gridMapFilters/MathExpressionFilter
+        params:
+          output_layer: traversability
+          expression: 0.5 * (1.0 - (slope / 0.7)) + 0.5 * (1.0 - (roughness / 0.15))
+
+      filter7:
+        name: traversability_lower_threshold
+        type: gridMapFilters/ThresholdFilter
+        params:
+          layer: traversability
+          lower_threshold: 0.0
+          set_to: 0.0
+
+      filter8:
+        name: traversability_upper_threshold
+        type: gridMapFilters/ThresholdFilter
+        params:
+          layer: traversability
+          upper_threshold: 1.0
+          set_to: 1.0

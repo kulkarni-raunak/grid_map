@@ -8,8 +8,10 @@ find_package(grid_map_core REQUIRED)
 find_package(grid_map_msgs REQUIRED)
 find_package(grid_map_ros REQUIRED)
 find_package(PCL REQUIRED) ## See ROS REP2000 for expected PCL version
+find_package(pcl_conversions REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 find_package(OpenMP QUIET)
 if(OpenMP_FOUND)
@@ -36,8 +38,10 @@ set(dependencies
   grid_map_core
   grid_map_msgs
   grid_map_ros
+  pcl_conversions
   rclcpp
   rcutils
+  sensor_msgs
 )
 
 ###########
@@ -71,9 +75,22 @@ add_executable(grid_map_pcl_loader_node
   src/grid_map_pcl_loader_node.cpp
 )
 
+add_executable(grid_map_pcl_pointcloud_to_gridmap_node
+  src/grid_map_pcl_pointcloud_to_gridmap_node.cpp
+)
+
 target_link_libraries(grid_map_pcl_loader_node
   ${PROJECT_NAME}
   ${OpenMP_CXX_LIBRARIES}
+)
+
+target_link_libraries(grid_map_pcl_pointcloud_to_gridmap_node
+  ${PROJECT_NAME}
+  ${OpenMP_CXX_LIBRARIES}
+)
+
+ament_target_dependencies(grid_map_pcl_pointcloud_to_gridmap_node
+  ${dependencies}
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -89,6 +106,7 @@ install(
   TARGETS
     ${PROJECT_NAME}
     grid_map_pcl_loader_node
+    grid_map_pcl_pointcloud_to_gridmap_node
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
