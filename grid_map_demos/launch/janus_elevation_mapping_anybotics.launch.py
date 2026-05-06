@@ -27,12 +27,27 @@ def generate_launch_description():
     )
     use_filters_arg = DeclareLaunchArgument(
         'use_filters',
-        default_value='false',
+        default_value='true',
         description='Run grid_map_filters demo pipeline over the input GridMap.',
     )
     use_sim_time_arg = DeclareLaunchArgument('use_sim_time', default_value='true')
 
     pointcloud_topic_arg = DeclareLaunchArgument('pointcloud_topic', default_value='/janus/velodyne_points')
+    queue_size_arg = DeclareLaunchArgument(
+        'queue_size',
+        default_value='1',
+        description='PointCloud subscription queue depth for the mapper. Use 1 to keep newest data in real-time.',
+    )
+    max_abs_xy_m_arg = DeclareLaunchArgument(
+        'max_abs_xy_m',
+        default_value='150.0',
+        description='Discard points with |x| or |y| larger than this value before mapping.',
+    )
+    max_abs_z_m_arg = DeclareLaunchArgument(
+        'max_abs_z_m',
+        default_value='20.0',
+        description='Discard points with |z| larger than this value before mapping.',
+    )
     map_frame_arg = DeclareLaunchArgument(
         'map_frame',
         default_value='',
@@ -88,6 +103,9 @@ def generate_launch_description():
                 'grid_map_topic': LaunchConfiguration('raw_map_topic'),
                 'map_frame': LaunchConfiguration('map_frame'),
                 'pcl_config_file': mapper_config,
+                'queue_size': LaunchConfiguration('queue_size'),
+                'max_abs_xy_m': LaunchConfiguration('max_abs_xy_m'),
+                'max_abs_z_m': LaunchConfiguration('max_abs_z_m'),
             },
         ],
         condition=IfCondition(LaunchConfiguration('use_mapper')),
@@ -147,6 +165,9 @@ def generate_launch_description():
         use_filters_arg,
         use_sim_time_arg,
         pointcloud_topic_arg,
+        queue_size_arg,
+        max_abs_xy_m_arg,
+        max_abs_z_m_arg,
         map_frame_arg,
         raw_map_topic_arg,
         filtered_map_topic_arg,
